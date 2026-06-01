@@ -419,6 +419,7 @@ body {
 .main-panel {
   background-color: var(--brand-50);
   overflow-y: auto;
+  overflow-x: hidden;
   position: relative;
   z-index: 1;
 }
@@ -428,6 +429,7 @@ body {
   flex: 1;
   padding: 1rem;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Section design */
@@ -1283,12 +1285,14 @@ body {
   display: flex;
   flex-direction: column;
   transform: translateX(-100%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  visibility: hidden; /* Prevent iOS Safari viewport scaling bug */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s;
   box-shadow: var(--shadow-lg);
 }
 
 .sidebar.active {
   transform: translateX(0);
+  visibility: visible;
 }
 
 /* ==========================================================================
@@ -1318,6 +1322,7 @@ body {
   .sidebar {
     position: static !important;
     transform: none !important;
+    visibility: visible !important;
     width: 260px !important;
     display: flex !important;
     background-color: white !important;
@@ -1783,3 +1788,11 @@ body {
 /* Colors for texts */
 .red-text { color: var(--alert-red); }
 .orange-text { color: var(--alert-orange); }
+
+/* Prevents iOS Safari from auto-zooming on focus by forcing 16px font size on inputs on mobile */
+@media (max-width: 1023px) {
+  .form-input,
+  .form-input-small {
+    font-size: 16px !important;
+  }
+}
