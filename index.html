@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>綠吔 CRM - 企業級響應式工作台</title>
+  <!-- Google Fonts - Inter & Noto Sans TC -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col overflow-x-hidden">
+
+  <!-- ================= APP WRAPPER ================= -->
+  <div id="app" class="flex-1 flex flex-col min-h-screen">
+
+    <!-- ================= PAGE 1: LOGIN (Centering Glass Card) ================= -->
+    <div id="page-login" class="flex-1 flex items-center justify-center p-4 md:p-8">
+      <div class="login-card glass-panel fade-in">
+        <!-- Logo & Header -->
+        <div class="login-header">
+          <div class="logo-badge">
+            <svg class="w-10 h-10 text-brand-600 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 11-4 0 2 2 0 014 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 0v8"/>
+            </svg>
+          </div>
+          <h2>綠吔 CRM</h2>
+          <p>LuYe Customer Relationship Management</p>
+        </div>
+
+        <!-- Form Elements -->
+        <div class="login-form space-y-4">
+          <div class="form-group">
+            <label for="input-account" class="field-label">帳號 / 行動電話</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+              </span>
+              <input type="text" id="input-account" placeholder="請輸入登入帳號" class="form-input">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="flex justify-between items-center mb-1.5">
+              <label for="input-password" class="field-label">密碼</label>
+              <button onclick="toggleForgotPassword(true)" class="text-link">忘記密碼？</button>
+            </div>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+              </span>
+              <input type="password" id="input-password" placeholder="請輸入密碼" class="form-input">
+            </div>
+          </div>
+
+          <!-- Error Alert Banner -->
+          <div id="login-error" class="error-banner hidden">
+            <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <span id="login-error-msg">請填寫完整的帳號與密碼。</span>
+          </div>
+
+          <!-- Action Button -->
+          <button onclick="handleLogin()" class="btn-primary w-full py-3.5 mt-2 flex items-center justify-center gap-2">
+            登入系統
+            <svg class="w-5 h-5 button-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= PAGE 2: LOGGED-IN PORTAL ================= -->
+    <div id="page-system" class="hidden flex-1 flex flex-col lg:flex-row min-h-screen overflow-hidden">
+      
+      <!-- Sidebar Overlay for Mobile/Tablet Drawer -->
+      <div id="sidebar-overlay" class="modal-overlay hidden" onclick="toggleSidebar(false)" style="z-index: 85;"></div>
+      
+      <!-- Sidebar Panel (Desktop: Persistent, Mobile: Slide-out Drawer) -->
+      <aside class="sidebar">
+        <!-- Brand logo block -->
+        <div class="sidebar-brand">
+          <div class="logo-small">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </div>
+          <h3>綠吔 CRM</h3>
+        </div>
+
+        <!-- User profile details -->
+        <div class="sidebar-profile">
+          <div class="avatar-large">綠</div>
+          <div class="profile-info">
+            <h4>綠吔銷售專員</h4>
+            <span class="badge-accent">工號: GY-9527</span>
+          </div>
+        </div>
+
+        <!-- Navigation Accordions -->
+        <nav class="sidebar-nav flex-1">
+          <!-- Item 1: Home Dashboard -->
+          <div id="accordion-home" onclick="setTab('home')" class="nav-item active">
+            <div class="nav-item-content">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
+              <span>首頁 Dashboard</span>
+            </div>
+          </div>
+
+          <!-- Item 2: Functions Group -->
+          <div class="accordion-group">
+            <div id="accordion-functions-header" onclick="toggleAccordion('functions')" class="accordion-header">
+              <div class="nav-item-content">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                </svg>
+                <span>功能模組</span>
+              </div>
+              <svg id="accordion-functions-arrow" class="w-4 h-4 arrow-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+            <div id="accordion-functions-content" class="accordion-body">
+              <a href="#" onclick="alertPrototypeAction('出勤管理')" class="sub-nav-item">出勤管理</a>
+              <a href="#" onclick="alertPrototypeAction('訂單管理')" class="sub-nav-item">訂單管理</a>
+              <a href="#" onclick="openDailyReportModal()" class="sub-nav-item">每日回報</a>
+            </div>
+          </div>
+
+          <!-- Item 3: Notifications Group -->
+          <div class="accordion-group">
+            <div id="accordion-notifications-header" onclick="toggleAccordion('notifications')" class="accordion-header">
+              <div class="nav-item-content">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+                <span>通知中心</span>
+              </div>
+              <svg id="accordion-notifications-arrow" class="w-4 h-4 arrow-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+            <div id="accordion-notifications-content" class="accordion-body">
+              <a href="#" onclick="alertPrototypeAction('系統待辦通知')" class="sub-nav-item">系統待辦通知</a>
+              <a href="#" onclick="alertPrototypeAction('業績考核提醒')" class="sub-nav-item">業績考核提醒</a>
+            </div>
+          </div>
+
+          <!-- Item 4: Reports Group -->
+          <div class="accordion-group">
+            <div id="accordion-reports-header" onclick="toggleAccordion('reports')" class="accordion-header">
+              <div class="nav-item-content">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 114 0v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span>報表與統計</span>
+              </div>
+              <svg id="accordion-reports-arrow" class="w-4 h-4 arrow-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+            <div id="accordion-reports-content" class="accordion-body">
+              <a href="#" onclick="alertPrototypeAction('商品歷史交易紀錄')" class="sub-nav-item">商品歷史交易紀錄</a>
+              <a href="#" onclick="alertPrototypeAction('客戶商品交易紀錄')" class="sub-nav-item">客戶商品交易紀錄</a>
+              <a href="#" onclick="alertPrototypeAction('業務交易紀錄')" class="sub-nav-item">業務交易紀錄</a>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Logout Trigger -->
+        <div class="sidebar-footer">
+          <button onclick="handleLogout()" class="btn-logout-sidebar">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            <span>登出系統</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Panel Workspace -->
+      <div class="main-panel flex-1 flex flex-col">
+        
+        <!-- [MOBILE/TABLET ONLY] Top Navigation Bar -->
+        <header class="mobile-header">
+          <div class="mobile-header-user">
+            <div class="avatar-small">綠</div>
+            <div class="mobile-user-details">
+              <h4>陳專員</h4>
+              <span class="location-badge">台北營業部</span>
+            </div>
+          </div>
+          <div class="mobile-header-actions">
+            <!-- Logout Button -->
+            <button onclick="handleLogout()" class="icon-button red-text" title="登出系統">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 11-12.728 0m6.364-3v9" />
+              </svg>
+            </button>
+            <!-- Mobile Sidebar Menu Toggle (Gear Icon) -->
+            <button id="header-btn-functions" onclick="toggleSidebar(true)" class="icon-button" title="展開選單">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+            <!-- Notifications Panel Toggle -->
+            <button id="header-btn-notifications" onclick="setTab('notifications')" class="icon-button relative-badge" title="通知中心">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+              </svg>
+              <span class="red-dot"></span>
+            </button>
+          </div>
+        </header>
+
+        <!-- [DESKTOP ONLY] Top welcome header -->
+        <header class="desktop-header">
+          <div class="header-welcome">
+            <span class="greeting-subtitle">今日工作進度</span>
+            <div class="greeting-row">
+              <h2>您好，陳專員</h2>
+              <span class="branch-pill">台北營業部</span>
+            </div>
+          </div>
+          <div class="header-desktop-actions">
+            <button onclick="setTab('notifications')" class="action-btn-circle relative-badge" title="通知中心">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+              </svg>
+              <span class="red-dot"></span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Workspace Viewport -->
+        <main class="workspace">
+
+          <!-- ================= CORE SUB-PAGE 1: HOME (DASHBOARD) ================= -->
+          <section id="subpage-home" class="subpage-section space-y-6 fade-in">
+            <!-- Block 1: Business Management -->
+            <div class="section-group">
+              <div class="section-title">
+                <span class="title-bar"></span>
+                <h3>業務管理</h3>
+              </div>
+
+              <div class="grid-2 gap-4">
+                <!-- Card: Unfilled Daily Report -->
+                <div onclick="openDailyReportModal()" class="interactive-card flex-row justify-between shadow-sm group">
+                  <div class="card-text">
+                    <h5>日報未填</h5>
+                  </div>
+                  <div class="badge-circle bg-alert-red transform group-hover:scale-110">
+                    3
+                  </div>
+                </div>
+
+                <!-- Card: Long time no contact -->
+                <div onclick="openContactModal()" class="interactive-card flex-row justify-between shadow-sm group">
+                  <div class="card-text">
+                    <h5>久未聯繫</h5>
+                  </div>
+                  <div class="badge-circle bg-alert-orange transform group-hover:scale-110">
+                    12
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Block 2: Tracking Management -->
+            <div class="section-group">
+              <div class="section-title">
+                <span class="title-bar"></span>
+                <h3>追蹤管理</h3>
+              </div>
+
+              <div class="grid-1 md:grid-2 gap-4">
+                <!-- Card: Overdue Receivables -->
+                <div onclick="openReceivableModal()" class="interactive-card flex-row justify-between shadow-sm group">
+                  <div class="card-text">
+                    <h5>應收逾期</h5>
+                  </div>
+                  <div class="badge-circle bg-alert-red transform group-hover:scale-110">
+                    5
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI Completion Panel -->
+            <div class="info-panel glass-card shadow-sm">
+              <div class="panel-header justify-between">
+                <h4>本月業績指標達標率</h4>
+                <span class="value-highlight text-brand-600">85%</span>
+              </div>
+              <div class="progress-container">
+                <div class="progress-bar-fill progress-animated" style="width: 85%"></div>
+              </div>
+              <div class="panel-footer justify-between">
+                <span>累計拜訪客戶: 142 次</span>
+                <span>業績缺口: 15%</span>
+              </div>
+            </div>
+
+            <!-- Announcements & Logs -->
+            <div class="section-group">
+              <h4 class="section-subtitle">系統即時動態</h4>
+              <div class="announcement-card shadow-sm border-l-4">
+                <div class="announcement-header justify-between">
+                  <span>系統通知 • 15分鐘前</span>
+                  <span class="announcement-badge alert-red">● 待辦</span>
+                </div>
+                <p class="announcement-content">【逾期警告】客戶「綠活股份有限公司」應收帳款已逾期 15 天，請儘速聯繫並填寫催收紀錄。</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= CORE SUB-PAGE 2: FUNCTIONS ================= -->
+          <section id="subpage-functions" class="subpage-section space-y-6 hidden fade-in">
+            <div class="page-title-block border-b">
+              <h3>綠吔業務控制台</h3>
+              <p>您可以點選下方快捷大類進行業務穿透與系統管理</p>
+            </div>
+
+            <!-- Dashboard Shortcuts -->
+            <div class="module-card glass-card shadow-sm">
+              <div class="module-header border-b">
+                <span class="icon-span bg-brand-50 text-brand-600">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                  </svg>
+                </span>
+                <h4>首頁快捷與指標直達</h4>
+              </div>
+              <div class="module-grid grid-1 md:grid-3 gap-3">
+                <button onclick="setTab('home')" class="shortcut-btn">
+                  <strong>返回首頁 Dashboard</strong>
+                  <span>查看今日所有未填日報與逾期總覽</span>
+                </button>
+                <button onclick="openDailyReportModal()" class="shortcut-btn">
+                  <strong>快速填寫未完成日報</strong>
+                  <span class="red-text">● 目前有 3 筆待處理</span>
+                </button>
+                <button onclick="openReceivableModal()" class="shortcut-btn">
+                  <strong>快速查閱催收款狀態</strong>
+                  <span class="red-text">● 目前有 5 筆逾期帳款</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Core Business Modules -->
+            <div class="module-card glass-card shadow-sm">
+              <div class="module-header border-b">
+                <span class="icon-span bg-brand-50 text-brand-600">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                  </svg>
+                </span>
+                <h4>功能核心業務模組</h4>
+              </div>
+              <div class="module-grid grid-1 md:grid-3 gap-3">
+                <div onclick="alertPrototypeAction('出勤管理')" class="module-box bg-slate-50 border group hover:border-brand-200">
+                  <div class="box-icon bg-emerald-50 text-emerald-600 border-emerald-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
+                  <span>出勤管理</span>
+                </div>
+                
+                <div onclick="alertPrototypeAction('訂單管理')" class="module-box bg-slate-50 border group hover:border-brand-200">
+                  <div class="box-icon bg-blue-50 text-blue-600 border-blue-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                  </div>
+                  <span>訂單管理</span>
+                </div>
+
+                <div onclick="openDailyReportModal()" class="module-box bg-slate-50 border group hover:border-brand-200">
+                  <div class="box-icon bg-amber-50 text-amber-600 border-amber-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                    </svg>
+                  </div>
+                  <span>每日回報</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Report Shortcuts -->
+            <div class="module-card glass-card shadow-sm">
+              <div class="module-header border-b">
+                <span class="icon-span bg-brand-50 text-brand-600">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 114 0v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                  </svg>
+                </span>
+                <h4>分析統計報表</h4>
+              </div>
+              <div class="module-list">
+                <div onclick="setTab('reports')" class="list-item-btn border hover:border-brand-200">
+                  <div class="btn-text">
+                    <strong>個人季度與年化業績總覽</strong>
+                    <span>點擊跳轉至數據中心並可匯出 PDF</span>
+                  </div>
+                  <svg class="w-5 h-5 arrow-nav" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= CORE SUB-PAGE 3: NOTIFICATIONS ================= -->
+          <section id="subpage-notifications" class="subpage-section space-y-4 hidden fade-in">
+            <div class="page-title-block flex-row justify-between border-b">
+              <h3>通知中心</h3>
+              <!-- Back to Home triggers tab change -->
+              <button id="btn-notifications-back-home" onclick="setTab('home')" class="btn-secondary py-2 px-4 text-xs flex items-center gap-1.5 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span>返回首頁</span>
+              </button>
+            </div>
+
+            <!-- Card list -->
+            <div class="notification-list space-y-3">
+              <div class="notification-alert border-l-red bg-white border shadow-sm">
+                <div class="notification-meta justify-between">
+                  <span class="tag-alert-red">緊急財務待辦</span>
+                  <span class="time-stamp">上午 09:30</span>
+                </div>
+                <h4>「富康醫療」應收帳款已逾期達15天</h4>
+                <p>目前逾期金額為：$150,000 元，請指派專人於本日下班前完成第一次催收聯繫並補登日報。</p>
+              </div>
+
+              <div class="notification-alert border-l-orange bg-white border shadow-sm">
+                <div class="notification-meta justify-between">
+                  <span class="tag-alert-orange">客戶關係預警</span>
+                  <span class="time-stamp">昨天 17:15</span>
+                </div>
+                <h4>重要客戶「宏碁建設」已超過 30 天未進行拜訪</h4>
+                <p>為保障客戶續約率，請儘速與聯絡人張經理敲定下一季度需求研討時間。</p>
+              </div>
+
+              <div class="notification-alert border-l-brand bg-white border shadow-sm">
+                <div class="notification-meta justify-between">
+                  <span class="tag-alert-brand">系統維護通知</span>
+                  <span class="time-stamp">2026/05/28</span>
+                </div>
+                <h4>CRM 系統維護與版本更新公告</h4>
+                <p>系統將於本週六 (05/30) 23:00 至 週日 03:00 進行資料庫架構升級優化，屆時將暫停服務。</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= CORE SUB-PAGE 4: REPORTS ================= -->
+          <section id="subpage-reports" class="subpage-section space-y-4 hidden fade-in">
+            <div class="page-title-block border-b">
+              <h3>統計報表</h3>
+            </div>
+
+            <!-- Funnel stats -->
+            <div class="report-card glass-card p-5 shadow-sm">
+              <h4 class="card-title mb-4">商品與交易轉換分析</h4>
+              <div class="funnel-container space-y-3">
+                <div class="funnel-row">
+                  <div class="funnel-info justify-between">
+                    <span>商品瀏覽次數 (50筆)</span>
+                    <span class="funnel-percentage">100%</span>
+                  </div>
+                  <div class="funnel-track bg-slate-100">
+                    <div class="funnel-fill bg-brand-600" style="width: 100%"></div>
+                  </div>
+                </div>
+
+                <div class="funnel-row">
+                  <div class="funnel-info justify-between">
+                    <span>訂單成立筆數 (32筆)</span>
+                    <span class="funnel-percentage">64%</span>
+                  </div>
+                  <div class="funnel-track bg-slate-100">
+                    <div class="funnel-fill bg-emerald-500" style="width: 64%"></div>
+                  </div>
+                </div>
+
+                <div class="funnel-row">
+                  <div class="funnel-info justify-between">
+                    <span>成功交易筆數 (12筆)</span>
+                    <span class="funnel-percentage">24%</span>
+                  </div>
+                  <div class="funnel-track bg-slate-100">
+                    <div class="funnel-fill bg-teal-500" style="width: 24%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CSV export block -->
+            <div class="export-banner glass-card shadow-sm p-4 flex-row justify-between">
+              <div class="export-text">
+                <h4>商品與業務交易紀錄匯出</h4>
+                <p>包含所有商品歷史交易紀錄、客戶商品交易紀錄及業務交易紀錄之 CSV 檔案</p>
+              </div>
+              <button onclick="alertPrototypeAction('交易紀錄匯出')" class="btn-primary p-3 rounded-lg flex items-center justify-center" title="匯出報表">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+              </button>
+            </div>
+          </section>
+
+        </main>
+
+
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- ======================== MODALS ======================= -->
+  <!-- ======================================================= -->
+
+  <!-- Modal 1: Forgot Password Modal -->
+  <div id="modal-forgot" class="modal-overlay hidden">
+    <div class="modal-card scale-in">
+      <div class="modal-header border-b">
+        <h3>
+          <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+          </svg>
+          忘記密碼找回
+        </h3>
+        <button onclick="toggleForgotPassword(false)" class="close-btn">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body space-y-3">
+        <p class="modal-desc">請輸入您註冊綠吔 CRM 時所綁定的手機號碼，系統將發送一組安全驗證碼以協助您重設密碼。</p>
+        <div class="form-group">
+          <label for="forgot-phone" class="field-label-small">綁定手機號碼</label>
+          <input type="tel" id="forgot-phone" placeholder="例如：0912345678" class="form-input-small">
+          <p id="forgot-error" class="error-msg-small hidden">請填寫正確的手機號碼。</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="toggleForgotPassword(false)" class="btn-cancel">取消</button>
+        <button onclick="submitForgotPassword()" class="btn-confirm">傳送驗證碼</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Generic Alert Modal -->
+  <div id="modal-alert" class="modal-overlay hidden">
+    <div class="modal-card card-narrow text-center scale-in">
+      <div class="alert-icon bg-brand-50 text-brand-600 border border-brand-100">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div>
+        <h3 id="modal-alert-title" class="alert-title">模組載入提示</h3>
+        <p id="modal-alert-desc" class="alert-desc">此功能正跳轉至實際操作頁面，敬請期待。</p>
+      </div>
+      <div class="pt-2">
+        <button onclick="closeAlertModal()" class="btn-confirm w-full py-2.5">
+          確認
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Unfilled Daily Report List -->
+  <div id="modal-daily" class="modal-overlay hidden">
+    <div class="modal-card scale-in">
+      <div class="modal-header border-b">
+        <h3>
+          <span class="status-indicator bg-alert-red animate-ping-fast"></span>
+          日報未填案件 (共 3 筆)
+        </h3>
+        <button onclick="closeDailyReportModal()" class="close-btn">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body max-h-64 overflow-y-auto no-scrollbar space-y-2">
+        
+        <div class="list-record border">
+          <div class="record-header justify-between">
+            <strong>綠色家園連鎖超市</strong>
+            <span class="red-text font-bold">未填拜訪紀錄</span>
+          </div>
+          <p class="record-detail">拜訪日期：2026/05/29 14:00</p>
+          <button onclick="alertPrototypeAction('快速補登綠色家園日報')" class="btn-action-fill mt-2">快速補登</button>
+        </div>
+
+        <div class="list-record border">
+          <div class="record-header justify-between">
+            <strong>綠川電子材料</strong>
+            <span class="red-text font-bold">未填電話記錄</span>
+          </div>
+          <p class="record-detail">電訪日期：2026/05/28 10:30</p>
+          <button onclick="alertPrototypeAction('快速補登綠川電子日報')" class="btn-action-fill mt-2">快速補登</button>
+        </div>
+
+        <div class="list-record border">
+          <div class="record-header justify-between">
+            <strong>綠光森林建案</strong>
+            <span class="red-text font-bold">未填拜訪紀錄</span>
+          </div>
+          <p class="record-detail">拜訪日期：2026/05/28 16:20</p>
+          <button onclick="alertPrototypeAction('快速補登綠光森林日報')" class="btn-action-fill mt-2">快速補登</button>
+        </div>
+
+      </div>
+      <div class="modal-footer pt-1">
+        <button onclick="closeDailyReportModal()" class="btn-cancel w-full">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Long Time No Contact List -->
+  <div id="modal-contact" class="modal-overlay hidden">
+    <div class="modal-card scale-in">
+      <div class="modal-header border-b">
+        <h3>
+          <span class="status-indicator bg-alert-orange animate-ping-fast"></span>
+          久未聯繫預警名單 (展示前 2/12 筆)
+        </h3>
+        <button onclick="closeContactModal()" class="close-btn">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body max-h-64 overflow-y-auto no-scrollbar space-y-2">
+        
+        <div class="list-record border">
+          <div class="record-header justify-between">
+            <strong>野綠永續餐飲公司</strong>
+            <span class="orange-text font-bold">已 45 天未訪</span>
+          </div>
+          <p class="record-detail">窗口：林採購經理</p>
+          <p class="record-detail-muted">建議：進行下一季菜單新品提案預約</p>
+          <button onclick="alertPrototypeAction('預約林採購拜訪')" class="btn-action-solid mt-2">立即發起預約約訪</button>
+        </div>
+
+        <div class="list-record border">
+          <div class="record-header justify-between">
+            <strong>綠林文創工作室</strong>
+            <span class="orange-text font-bold">已 32 天未訪</span>
+          </div>
+          <p class="record-detail">窗口：陳主創藝術家</p>
+          <p class="record-detail-muted">建議：寄送最新聯名 CRM 優惠企劃</p>
+          <button onclick="alertPrototypeAction('發送優惠企劃')" class="btn-action-muted mt-2">寄送關懷郵件</button>
+        </div>
+
+      </div>
+      <div class="modal-footer pt-1">
+        <button onclick="closeContactModal()" class="btn-cancel w-full">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Overdue Receivable List -->
+  <div id="modal-receivable" class="modal-overlay hidden">
+    <div class="modal-card scale-in">
+      <div class="modal-header border-b">
+        <h3>
+          <span class="status-indicator bg-alert-red animate-ping-fast"></span>
+          應收逾期嚴重告警 (共 5 筆)
+        </h3>
+        <button onclick="closeReceivableModal()" class="close-btn">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body max-h-64 overflow-y-auto no-scrollbar space-y-2">
+        
+        <div class="list-record border">
+          <div class="record-header justify-between">
+            <strong>富康醫療設備</strong>
+            <span class="red-text font-extrabold">逾期 15 天</span>
+          </div>
+          <div class="record-row justify-between text-slate-600 mt-1">
+            <span>待收款：$150,000 元</span>
+            <span>承辦人：張大衛</span>
+          </div>
+          <button onclick="alertPrototypeAction('催收電訪撥號')" class="btn-action-solid-red mt-2">撥打催收專線 (02-2765-xxxx)</button>
+        </div>
+
+        <div class="list-record border">
+          <div class="record-header justify-between">
+            <strong>山綠茶葉進出口商</strong>
+            <span class="red-text font-extrabold">逾期 8 天</span>
+          </div>
+          <div class="record-row justify-between text-slate-600 mt-1">
+            <span>待收款：$85,000 元</span>
+            <span>承辦人：李曉華</span>
+          </div>
+          <button onclick="alertPrototypeAction('寄送催告存證信函')" class="btn-action-muted mt-2">補發電子催款單</button>
+        </div>
+
+      </div>
+      <div class="modal-footer pt-1">
+        <button onclick="closeReceivableModal()" class="btn-cancel w-full">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript file inclusion -->
+  <script src="app.js"></script>
+</body>
+</html>
